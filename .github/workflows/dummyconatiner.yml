@@ -1,8 +1,11 @@
-name: "Trivy-Test"
+name: "Dummy-Container-Scan"
 
-on: 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
-
 
 jobs:
   Job1:
