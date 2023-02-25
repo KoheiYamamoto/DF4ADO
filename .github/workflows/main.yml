@@ -1,48 +1,34 @@
-name: "Trivy-Test"
-
-on: 
+name: MSDO windows-latest
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  Job1:
-    runs-on: ubuntu-latest
-    steps:
-    
-      # checkout the repo
-      - name: "Checkout GitHub Action"
-        uses: actions/checkout@main
-      
-      # setup dotnet
-      - uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: |
-              5.0.x
-              6.0.x
-              
-      # Docker Pull
-      - name: Docker pull
-        run: docker pull vulnerables/web-dvwa:latest
-        
-      # Microsoft Security DevOps ツールの実行
-      # Run analyzers
-      - name: Run Microsoft Security DevOps Analysis
-        uses: microsoft/security-devops-action@preview
-        id: msdo
-        env:
-          GDN_TRIVY_ACTION: image
-          GDN_TRIVY_TARGET: vulnerables/web-dvwa:latest
-        with:
-          categories: "containers" 
+  sample:
 
-      # Upload alerts to the Security tab
-      - name: Upload alerts to Security tab
-        uses: github/codeql-action/upload-sarif@v1
-        with:
-          sarif_file: "${{ github.workspace }}/.gdn/.r/trivy/001/trivy.sarif"
-          
-      # Upload alerts file as a workflow artifact        
-      - name: Upload alerts file as a workflow artifact
-        uses: actions/upload-artifact@v3
-        with:  
-          name: alerts
-          path: "${{ github.workspace }}/.gdn/.r/trivy/001/trivy.sarif"
+    # MSDO runs on windows-latest and ubuntu-latest.
+    # macos-latest supporting coming soon
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: |
+          5.0.x
+          6.0.x
+
+    # Run analyzers
+    - name: Run Microsoft Security DevOps Analysis
+      uses: microsoft/security-devops-action@preview
+      id: msdo
+
+    # Upload alerts to the Security tab
+    - name: Upload alerts to Security tab
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ${{ steps.msdo.outputs.sarifFile }}
