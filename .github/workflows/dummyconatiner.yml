@@ -27,6 +27,7 @@ jobs:
           GDN_TRIVY_TARGET: vulnerables/web-dvwa:latest
         with:
           categories: "containers"
+          tool: "Trivy"
 
       # Upload alerts to the Security tab
       - name: Upload alerts to Security tab
